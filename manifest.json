@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Image Enhancer",
+  "version": "1.0",
+  "description": "自动将网页上小尺寸图片(w<80)替换为高清图片(w=1920)",
+  "action": {
+    "default_icon": {
+
+    }
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "notifications"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+
+  }
+}
