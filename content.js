@@ -1,5 +1,5 @@
 // 当页面加载完成后执行
-console.log('Image Enhancer Extension content script loaded');
+console.log('Mobbin Cracker Extension content script loaded');
 
 // 修改图片链接，将w<80的参数修改为w=1920
 function updateImageSources() {

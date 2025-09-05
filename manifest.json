@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Mobbin Cracker",
   "version": "1.0",
-  "description": "自动将Mobbin上小尺寸图片(w<80)替换为高清图片(w=1920)",
+  "description": "mobbin.com破解器",
   "action": {
     "default_icon": {
 
@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.mobbin.com/*"],
+      "matches": ["*://*.mobbin.com/*"],
       "js": ["content.js"]
     }
   ],
