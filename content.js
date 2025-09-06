@@ -42,7 +42,7 @@ function updateImageSources() {
         }
       } catch (e) {
         // 处理无效URL的情况
-        console.error(`Error processing image URL: ${src}`, e);
+        // console.error(`Error processing image URL: ${src ?? ''}`, e);
       }
     }
   });
@@ -76,7 +76,7 @@ function initialize() {
               hasNewImages = true;
             }
           }
-        });
+        })
       }
     });
     
