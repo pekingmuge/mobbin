@@ -54,7 +54,6 @@ function updateImageSources() {
   
   // 如果有更新，通知后台脚本
   if (updatedCount > 0) {
-    // If extension was reloaded, messaging may be invalid, ignore in that case
     try {
       if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
         chrome.runtime.sendMessage({
