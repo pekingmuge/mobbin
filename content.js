@@ -1,6 +1,8 @@
 // 当页面加载完成后执行
 console.log('Mobbin Cracker Extension content script loaded');
 
+let mobbinUrls = new Set();
+
 // 修改图片链接，将w<80的参数修改为w=1920
 function updateImageSources() {
   console.log('Checking and updating image sources...');
@@ -16,7 +18,6 @@ function updateImageSources() {
         // 解析URL和参数
         const url = new URL(src);
         const params = new URLSearchParams(url.search);
-        
         // 检查是否有w参数，且值小于80
         if (params.has('w')) {
           const wValue = parseInt(params.get('w'));
@@ -30,6 +31,8 @@ function updateImageSources() {
             url.search = params.toString();
             // 更新图片src
             img.setAttribute('src', url.toString());
+            // Collect upgraded URL
+            mobbinUrls.add(url.toString());
             updatedCount++;
             console.log(`Updated image src: ${src} -> ${url.toString()}`);
             // 设置图片父元素的class为grow
@@ -51,10 +54,16 @@ function updateImageSources() {
   
   // 如果有更新，通知后台脚本
   if (updatedCount > 0) {
-    chrome.runtime.sendMessage({
-      action: "imagesUpdated",
-      count: updatedCount
-    });
+    try {
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+        chrome.runtime.sendMessage({
+          action: "imagesUpdated",
+          count: updatedCount
+        });
+      }
+    } catch (_) {
+      // no-op
+    }
   }
 }
 
@@ -85,7 +94,7 @@ function initialize() {
       updateImageSources();
     }
   });
-  
+
   // 配置观察器
   observer.observe(document.body, {
     childList: true,
@@ -93,5 +102,11 @@ function initialize() {
   });
 }
 
-// 执行初始化
 initialize();
+
+// Respond to image url request (used by download all)
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message && message.action === 'getImageUrls' && typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+    sendResponse({ urls: Array.from(mobbinUrls) });
+  }
+});

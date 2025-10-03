@@ -4,13 +4,15 @@
   "version": "1.0",
   "description": "mobbin.com破解器",
   "action": {
+    "default_popup": "popup.html",
     "default_icon": {
 
     }
   },
   "permissions": [
     "activeTab",
-    "notifications"
+    "notifications",
+    "downloads"
   ],
   "background": {
     "service_worker": "background.js"
