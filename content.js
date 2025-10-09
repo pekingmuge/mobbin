@@ -22,7 +22,7 @@ function updateImageSources() {
           const wValue = parseInt(params.get('w'));
           if (wValue < 80) {
             // 修改w参数为1920
-            params.set('w', '640');
+            params.set('w', '1920');
             // 移除image参数
             params.delete('image');
             params.delete("gravity");
@@ -58,13 +58,40 @@ function updateImageSources() {
   }
 }
 
+// 查找并移除包含"Access all"的h1标签所在的aside元素
+function removeAccessAllAside() {
+  // 查找所有h1标签
+  const h1Elements = document.querySelectorAll('h1');
+  
+  // 遍历所有h1标签，查找包含"Access all"的标签
+  for (const h1 of h1Elements) {
+    if (h1.textContent && h1.textContent.includes('Access all')) {
+      console.log('找到包含Access all的h1标签:', h1.textContent);
+      
+      // 向上查找最近的aside标签
+      let currentElement = h1;
+      while (currentElement && currentElement.tagName !== 'ASIDE') {
+        currentElement = currentElement.parentElement;
+      }
+      
+      // 如果找到aside标签，则移除它
+      if (currentElement && currentElement.tagName === 'ASIDE') {
+        console.log('找到并移除aside元素');
+        currentElement.remove();
+      }
+    }
+  }
+}
+
 // 初始化内容脚本功能
 function initialize() {
   updateImageSources();
+  removeAccessAllAside();
   
-  // 监听DOM变化，处理动态加载的图片
+  // 监听DOM变化，处理动态加载的图片和新添加的h1标签
   const observer = new MutationObserver(mutations => {
     let hasNewImages = false;
+    let hasNewElements = false;
     
     mutations.forEach(mutation => {
       if (mutation.type === 'childList') {
@@ -75,6 +102,11 @@ function initialize() {
             if (node.tagName === 'IMG' || node.querySelector('img')) {
               hasNewImages = true;
             }
+            
+            // 检查新添加的节点是否包含h1标签
+            if (node.tagName === 'H1' || node.querySelector('h1')) {
+              hasNewElements = true;
+            }
           }
         })
       }
@@ -83,6 +115,11 @@ function initialize() {
     // 如果有新图片添加，重新运行更新函数
     if (hasNewImages) {
       updateImageSources();
+    }
+    
+    // 如果有新元素添加，检查并移除包含Access all的h1标签所在的aside元素
+    if (hasNewElements) {
+      removeAccessAllAside();
     }
   });
   
