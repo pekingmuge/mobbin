@@ -1,51 +1,71 @@
-// 当DOM加载完成后执行
+// Execute when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
   const toggle = document.getElementById('toggle');
   const status = document.getElementById('status');
+  const donateButton = document.getElementById('donateButton');
+  const donateSection = document.getElementById('donateSection');
 
   console.log('Popup DOM loaded, elements found:', {
     toggle: !!toggle,
-    status: !!status
+    status: !!status,
+    donateButton: !!donateButton,
+    donateSection: !!donateSection
   });
 
-  // 从chrome.storage读取插件状态
+  // Add click event listener for donate button
+  donateButton.addEventListener('click', function () {
+    if (donateSection.classList.contains('show')) {
+      donateSection.classList.remove('show');
+      setTimeout(function () {
+        donateButton.textContent = 'Buy Me A Coffee';
+      }, 250);
+    } else {
+      donateButton.textContent = 'Hide';
+      setTimeout(function () {
+        donateSection.classList.add('show');
+      }, 50);
+    }
+  });
+
+  // Read extension status from chrome.storage
   chrome.storage.local.get('enabled', function (data) {
     console.log('Initial status from storage:', data);
-    const isEnabled = data.enabled !== false; // 默认启用
+    const isEnabled = data.enabled !== false; // Default to enabled
     console.log('Initial isEnabled value:', isEnabled);
 
-    // 创建临时样式元素来禁用过渡效果
+    // Create temporary style element to disable transition effects
     const tempStyle = document.createElement('style');
     tempStyle.id = 'temp-no-transition';
     tempStyle.textContent = `.slider, .slider:before { transition: none !important; }`;
     document.head.appendChild(tempStyle);
 
-    // 设置初始状态
+    // Set initial status
+    console.log('Setting toggle checked state:', isEnabled);
     toggle.checked = isEnabled;
 
-    // 强制重排以应用无过渡的变化
+    // Force reflow to apply changes without transition
     toggle.offsetWidth;
 
-    // 移除临时样式元素，恢复过渡效果
+    // Remove temporary style element, restore transition effects
     document.head.removeChild(tempStyle);
 
     updateStatusText(isEnabled);
   });
 
-  // 监听switch按钮的点击事件
+  // Listen for switch button click events
   toggle.addEventListener('change', function () {
     const isEnabled = this.checked;
     console.log('Toggle changed, checked value:', isEnabled);
 
-    // 保存状态到chrome.storage
+    // Save status to chrome.storage
     chrome.storage.local.set({ 'enabled': isEnabled }, function () {
-      console.log('插件状态已更新:', isEnabled ? '启用' : '禁用');
+      console.log('Mobbin Cracker status updated:', isEnabled ? 'ON' : 'OFF');
     });
 
-    // 更新状态文本
+    // Update status text
     updateStatusText(isEnabled);
 
-    // 向所有标签页发送消息，通知状态变化
+    // Send message to all tabs, notify status change
     chrome.tabs.query({}, function (tabs) {
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
@@ -56,10 +76,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // 更新状态文本
+  // Update status text
   function updateStatusText(enabled) {
     console.log('Updating status text with enabled value:', enabled);
-    status.textContent = enabled ? '插件已启用' : '插件已禁用';
+    status.textContent = enabled ? 'Mobbin Cracker is ON' : 'Mobbin Cracker is OFF';
     console.log('Status text updated to:', status.textContent);
   }
 });

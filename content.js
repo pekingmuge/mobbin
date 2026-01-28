@@ -1,25 +1,25 @@
-// 当页面加载完成后执行
+// Execute when page loads
 console.log('Mobbin Cracker Extension content script loaded');
 
-// 插件开关状态
+// Extension toggle status
 let isEnabled = true;
 
-// 从chrome.storage读取初始状态并初始化
+// Read initial status from chrome.storage and initialize
 chrome.storage.local.get('enabled', function (data) {
-  isEnabled = data.enabled !== false; // 默认启用
+  isEnabled = data.enabled !== false; // Default to enabled
   console.log('Mobbin Cracker Extension status:', isEnabled ? 'enabled' : 'disabled');
 
-  // 获取到正确状态后再执行初始化
+  // Execute initialization after getting correct status
   initialize();
 });
 
-// 监听来自popup的消息
+// Listen for messages from popup
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === 'toggleExtension') {
     isEnabled = request.enabled;
     console.log('Mobbin Cracker Extension status updated:', isEnabled ? 'enabled' : 'disabled');
 
-    // 如果启用，立即执行一次功能
+    // If enabled, execute functionality immediately
     if (isEnabled) {
       removeAccessAllAside();
       updateImageSources();
@@ -27,14 +27,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-// 修改图片链接，将w<80的参数修改为w=1920
+// Modify image links, change w<80 parameter to w=1920
 function updateImageSources() {
-  // 如果插件被禁用，不执行操作
+  // If extension is disabled, do not perform operations
   if (!isEnabled) return;
 
   // console.log('Checking and updating image sources...');
 
-  // 获取页面上所有的img标签
+  // Get all img tags on the page
   const images = document.querySelectorAll('img');
   let updatedCount = 0;
 
@@ -42,34 +42,34 @@ function updateImageSources() {
     const src = img.getAttribute('src');
     if (src) {
       try {
-        // 解析URL和参数
+        // Parse URL and parameters
         const url = new URL(src);
         const params = new URLSearchParams(url.search);
-        // 检查是否有w参数，且值小于80
+        // Check if there is a w parameter with value less than 80
         if (params.has('w')) {
           const wValue = parseInt(params.get('w'));
           if (wValue < 80) {
-            // 修改w参数为1920
+            // Modify w parameter to 1920
             params.set('w', '1920');
-            // 移除image参数
+            // Remove image parameter
             params.delete('image');
             params.delete("gravity");
             params.delete("v");
             url.search = params.toString();
-            // 更新图片src
+            // Update image src
             img.setAttribute('src', url.toString());
             updatedCount++;
             // console.log(`Updated image src: ${src} -> ${url.toString()}`);
-            // 找到img的下一个div兄弟
+            // Find next div sibling of img
             const nextDiv = img.nextElementSibling;
             if (nextDiv && nextDiv.tagName === 'DIV') {
-              // 对找到的div做进一步处理
+              // Further process the found div
               nextDiv.remove();
             }
           }
         }
       } catch (e) {
-        // 处理无效URL的情况
+        // Handle invalid URL cases
         // console.error(`Error processing image URL: ${src ?? ''}`, e);
       }
     }
@@ -77,7 +77,7 @@ function updateImageSources() {
 
   // console.log(`Updated ${updatedCount} images: w<80 changed to w=1920 and/or removed image parameter`);
 
-  // 如果有更新，通知后台脚本
+  // If there are updates, notify background script
   if (updatedCount > 0) {
     chrome.runtime.sendMessage({
       action: "imagesUpdated",
@@ -86,45 +86,45 @@ function updateImageSources() {
   }
 }
 
-// 查找并移除包含"Access all"的h1标签所在的aside元素
+// Find and remove aside element containing h1 tag with "Access all"
 function removeAccessAllAside() {
-  // 如果插件被禁用，不执行操作
+  // If extension is disabled, do not perform operations
   if (!isEnabled) return;
 
-  // 查找所有h1标签
+  // Find all h1 tags
   const h1Elements = document.querySelectorAll('h1');
 
-  // 遍历所有h1标签，查找包含"Access all"的标签
+  // Iterate through all h1 tags, find tags containing "Access all"
   for (const h1 of h1Elements) {
     if (h1.textContent && h1.textContent.includes('Access all')) {
-      // console.log('找到包含Access all的h1标签:', h1.textContent);
+      // console.log('Found h1 tag containing Access all:', h1.textContent);
 
-      // 向上查找最近的aside标签
+      // Find nearest aside tag by moving up the DOM tree
       let currentElement = h1;
       while (currentElement && currentElement.tagName !== 'ASIDE') {
         currentElement = currentElement.parentElement;
       }
 
-      // 如果找到aside标签，则移除它
+      // If aside tag is found, remove it
       if (currentElement && currentElement.tagName === 'ASIDE') {
-        // console.log('找到并移除aside元素');
+        // console.log('Found and removed aside element');
         currentElement.remove();
       }
     }
   }
 }
 
-// 初始化内容脚本功能
+// Initialize content script functionality
 function initialize() {
-  // 只有启用时才执行初始化操作
+  // Only execute initialization operations when enabled
   if (isEnabled) {
     removeAccessAllAside();
     updateImageSources();
   }
 
-  // 监听DOM变化，处理动态加载的图片和新添加的h1标签
+  // Listen for DOM changes, handle dynamically loaded images and newly added h1 tags
   const observer = new MutationObserver(mutations => {
-    // 如果插件被禁用，不执行操作
+    // If extension is disabled, do not perform operations
     if (!isEnabled) return;
 
     let hasNewImages = false;
@@ -133,14 +133,14 @@ function initialize() {
     mutations.forEach(mutation => {
       if (mutation.type === 'childList') {
         mutation.addedNodes.forEach(node => {
-          // 检查是否是元素节点
+          // Check if it's an element node
           if (node.nodeType === 1) {
-            // 检查新添加的节点是否是img或包含img
+            // Check if the newly added node is an img or contains img
             if (node.tagName === 'IMG' || node.querySelector('img')) {
               hasNewImages = true;
             }
 
-            // 检查新添加的节点是否包含h1标签
+            // Check if the newly added node contains h1 tag
             if (node.tagName === 'H1' || node.querySelector('h1')) {
               hasNewElements = true;
             }
@@ -149,22 +149,22 @@ function initialize() {
       }
     });
 
-    // 如果有新图片添加，重新运行更新函数
+    // If new images are added, re-run the update function
     if (hasNewImages) {
       updateImageSources();
     }
 
-    // 如果有新元素添加，检查并移除包含Access all的h1标签所在的aside元素
+    // If new elements are added, check and remove aside element containing h1 tag with Access all
     if (hasNewElements) {
       removeAccessAllAside();
     }
   });
 
-  // 配置观察器
+  // Configure observer
   observer.observe(document.body, {
     childList: true,
     subtree: true
   });
 }
 
-// 注意：initialize()函数现在在chrome.storage.local.get的回调中调用，确保获取到正确状态后再执行
+// Note: The initialize() function is now called in the chrome.storage.local.get callback to ensure correct status is obtained before execution
