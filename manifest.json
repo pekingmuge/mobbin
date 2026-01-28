@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Mobbin Cracker",
-  "version": "1.1",
+  "version": "1.2",
   "description": "mobbin.com Cracker",
   "action": {
     "default_icon": {},
