@@ -1,8 +1,37 @@
 // 当页面加载完成后执行
 console.log('Mobbin Cracker Extension content script loaded');
 
+// 插件开关状态
+let isEnabled = true;
+
+// 从chrome.storage读取初始状态并初始化
+chrome.storage.local.get('enabled', function (data) {
+  isEnabled = data.enabled !== false; // 默认启用
+  console.log('Mobbin Cracker Extension status:', isEnabled ? 'enabled' : 'disabled');
+
+  // 获取到正确状态后再执行初始化
+  initialize();
+});
+
+// 监听来自popup的消息
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === 'toggleExtension') {
+    isEnabled = request.enabled;
+    console.log('Mobbin Cracker Extension status updated:', isEnabled ? 'enabled' : 'disabled');
+
+    // 如果启用，立即执行一次功能
+    if (isEnabled) {
+      removeAccessAllAside();
+      updateImageSources();
+    }
+  }
+});
+
 // 修改图片链接，将w<80的参数修改为w=1920
 function updateImageSources() {
+  // 如果插件被禁用，不执行操作
+  if (!isEnabled) return;
+
   // console.log('Checking and updating image sources...');
 
   // 获取页面上所有的img标签
@@ -59,6 +88,9 @@ function updateImageSources() {
 
 // 查找并移除包含"Access all"的h1标签所在的aside元素
 function removeAccessAllAside() {
+  // 如果插件被禁用，不执行操作
+  if (!isEnabled) return;
+
   // 查找所有h1标签
   const h1Elements = document.querySelectorAll('h1');
 
@@ -84,11 +116,17 @@ function removeAccessAllAside() {
 
 // 初始化内容脚本功能
 function initialize() {
-  // updateImageSources();
-  removeAccessAllAside();
+  // 只有启用时才执行初始化操作
+  if (isEnabled) {
+    removeAccessAllAside();
+    updateImageSources();
+  }
 
   // 监听DOM变化，处理动态加载的图片和新添加的h1标签
   const observer = new MutationObserver(mutations => {
+    // 如果插件被禁用，不执行操作
+    if (!isEnabled) return;
+
     let hasNewImages = false;
     let hasNewElements = false;
 
@@ -129,5 +167,4 @@ function initialize() {
   });
 }
 
-// 执行初始化
-initialize();
+// 注意：initialize()函数现在在chrome.storage.local.get的回调中调用，确保获取到正确状态后再执行
