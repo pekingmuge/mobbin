@@ -66,6 +66,18 @@ function updateImageSources() {
               // Further process the found div
               nextDiv.remove();
             }
+            // 在 img 的上级 div 外包裹一层 <a>，结构为 <a><div><img></div></a>，并给 a 添加 url
+            const parentDiv = img.closest('div');
+            if (parentDiv && !parentDiv.parentElement.matches('a')) {
+              // 创建新的 <a> 元素
+              const link = document.createElement('a');
+              // 设置链接地址为图片地址
+              link.href = url.toString();
+              link.target = '_blank'; // 可选：新标签页打开
+              // 将 div 包裹进 a
+              parentDiv.parentNode.insertBefore(link, parentDiv);
+              link.appendChild(parentDiv);
+            }
           }
         }
       } catch (e) {
