@@ -89,56 +89,14 @@
       text-align: center;
     }
 
-    .donate-title {
-      margin: 0 0 10px 0;
-      font-size: 12px;
-      color: #666;
-      font-weight: normal;
-    }
-
-    .donate-qr {
-      max-width: 200px;
-      max-height: auto;
-      width: auto;
-      height: auto;
-      margin: 0 auto;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .donate-thanks {
-      margin: 10px 0 0 0;
-      font-size: 10px;
-      color: #999;
-    }
-
-    .donate-qr-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin: 10px 0;
-    }
-
-    .donate-qr-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .donate-qr-label {
-      margin: 5px 0 0 0;
-      font-size: 10px;
-      color: #666;
-    }
-
     .donate-button {
+      display: inline-block;
       margin-top: 15px;
       padding: 12px 24px;
       background: linear-gradient(135deg, #FF8C37 0%, #FF5E62 100%);
       color: white;
-      border: none;
+      text-decoration: none;
       border-radius: 25px;
-      cursor: pointer;
       font-size: 13px;
       font-weight: 600;
       font-family: 'Arial', sans-serif;
@@ -208,21 +166,6 @@
         opacity: 0;
       }
     }
-
-    .donate-section {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #e0e0e0;
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 0.5s ease;
-    }
-
-    .donate-section.show {
-      max-height: 1000px;
-      opacity: 1;
-    }
   </style>
 </head>
 
@@ -234,25 +177,8 @@
       <span class="slider"></span>
     </label>
     <div class="status" id="status">Mobbin Cracker is ON</div>
-    <button class="donate-button" id="donateButton">Buy Me A Coffee</button>
-    <div class="donate-section" id="donateSection">
-      <p class="donate-title">Buy Me a Coffee</p>
-      <div class="donate-qr-container">
-        <div class="donate-qr-item">
-          <img src="images/donate/wechat.jpg" alt="WeChat Donation" class="donate-qr">
-          <p class="donate-qr-label">WeChat</p>
-        </div>
-        <div class="donate-qr-item">
-          <img src="images/donate/alipay.jpg" alt="Alipay Donation" class="donate-qr">
-          <p class="donate-qr-label">Alipay</p>
-        </div>
-        <div class="donate-qr-item">
-          <img src="images/donate/buymeacoffee.jpg" alt="Buy Me A Coffee" class="donate-qr">
-          <p class="donate-qr-label">Buy Me A Coffee</p>
-        </div>
-      </div>
-      <p class="donate-thanks">Thank you for your support!</p>
-    </div>
+    <a href="https://mugesoft.lemonsqueezy.com/checkout/buy/ac1343ac-7521-4983-b6d6-ab6b12d80a85" class="donate-button"
+      target="_blank" rel="noopener noreferrer">Buy Me A Coffee</a>
   </div>
   <script src="popup.js"></script>
 </body>

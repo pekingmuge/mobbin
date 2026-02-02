@@ -2,29 +2,10 @@
 document.addEventListener('DOMContentLoaded', function () {
   const toggle = document.getElementById('toggle');
   const status = document.getElementById('status');
-  const donateButton = document.getElementById('donateButton');
-  const donateSection = document.getElementById('donateSection');
 
   console.log('Popup DOM loaded, elements found:', {
     toggle: !!toggle,
-    status: !!status,
-    donateButton: !!donateButton,
-    donateSection: !!donateSection
-  });
-
-  // Add click event listener for donate button
-  donateButton.addEventListener('click', function () {
-    if (donateSection.classList.contains('show')) {
-      donateSection.classList.remove('show');
-      setTimeout(function () {
-        donateButton.textContent = 'Buy Me A Coffee';
-      }, 250);
-    } else {
-      donateButton.textContent = 'Hide';
-      setTimeout(function () {
-        donateSection.classList.add('show');
-      }, 50);
-    }
+    status: !!status
   });
 
   // Read extension status from chrome.storage
